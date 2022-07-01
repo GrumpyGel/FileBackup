@@ -103,7 +103,7 @@ The Backup component of the FileBackup routines contains the following scripts..
 
 The FileLog script captures the Group's directory content producing a Log file of all directories and files. The log contains the size and last modified date for files. FileLog is mainly used from within other scripts, however, it must also be run manually when setting up a Group to be backed up - see "Tutorial" for more information. Parameters:
 
-| Script | Description |
+| Parameter | Description |
 | --- | --- |
 | -Path | The Group directory to Log. Example "E:\\MyDocz\\FileBackup\\TestGroup\\Live" |
 | -LogFile | Name of the Log file to create. If not supplied output is displayed to console. Example "Backup_TestGroup_Initial.log" |
@@ -120,6 +120,48 @@ Ouput is a text file with each line representing a directory or file. Similar to
 The Directory is listed first, all files in the directory are then listed. Subdirectories are then recursed. Directories and Files within them are listed in alphabetic order.
 
 Main functionality of FileLog is via recursive calls to the CreateLog_Directory function. This add the directory name and all its files to the log, then calls CreateLog_Directory again for all its subdirectories. Log content is buffered into a string and then output once all files are added. This is to improve performance as the cmdlet is used to create the Log file rather than a stream.
+
+#### FileLogCompare.ps1
+
+The FileLogCompare script reads 2 Log files and produces a Differences file. FileLogCompare is used from within the FileBackup script and need not be run manually. Parameters:
+
+| Parameter | Description |
+| --- | --- |
+| -OldLog | The name of the older/previous Log file. This is the name of the Log file created during the last Backup, or the initial manually created Log for the first time a Backup is created. Example "E:\MyDocz\FileBackup\Store\Backup_TestGroup_Initial.log". |
+| -OldBackup | If the old Log file is contained within a Backup zip file, the OldBaxckup parameter should be used instead of OldLog and should contain the name of the previous Backup file. FileLogCompare will read the old Log file from within the Zip. Example "E:\MyDocz\FileBackup\Store\Backup_TestGroup_20210306.zip". |
+| -NewLog | The name of the newer/current Log file created during this Backup. Example "E:\MyDocz\FileBackup\Store\Backup_TestGroup_20210306.log". |
+| -LogFile | Name of the Difference file to create. If not supplied output is displayed to console. Example "Backup_TestGroup_20210306.dif" |
+
+A file is deemed modified if the size if different or the modified timestamp is more than 3 seconds different. An exact match in timestamps is not required as moving files can truncate the milliseconds of the timestamp which results in seconds being rounded differently.
+
+FileLogCompare does not detect renamed or moved files or directories. If items are renamed or moved, their old name/location will be listed as deleted and current location as new.
+
+Ouput is a text file with each line representing a new or deleted directory or a new, modified or deleted file. Similar to CSV file, the data components are separated by '*' (as this can not appear in a file name). The fields are change type, object type and name. Change type can be "N"ew, "M"odified (files only) or "D"eleted. The object type can be "D"irectory or "File". The name is the directory or file name relative to the Group path. Examples:
+
+01 : N*D*Images\Template
+02 : D*D*Survey
+03 : N*F*Images\Template\Logo.jpg
+04 : M*F*Data\Settings.xml
+05 : D*F*APP_CODE\clsQuery.cs
+01 : New directory named "Images\Template".
+02 : Directory Survey has been deleted.
+03 : New file created called Logo.jpg in the Images\Template directory.
+04 : The file called Settings.xml in the Data directory has been modified.
+05 : The file called clsQuery.cs in the APP_CODE directory has been deleted.
+
+As FileLogCompare is written to support pre class enabled Powershell. The Old and New Logs are represented internally by Hashtables converted to Objects. Functionality is performed by various Log_* functions that operate on these arrays. They are:
+
+| Function | Description |
+| --- | --- |
+| Log_Open | Opens the Log as a .Net StreamReader and reads the first line. |
+| Log_Clear | Removed record of input Log directory and file. |
+| Log_Read | Reads the next line from a Log and populates the array with details of the director or file. |
+| Log_Close | Closes a Log. |
+| Log_Output | Adds a Difference to the buffered output. |
+| Log_ShowOutput | Outputs any buffered content. |
+| Log_Compare | Main routine to compare Logs. It is repetetively called from the main script code until both New and Old Logs have been completely read and closed. Once comparisons are made the function will skip necessary lines in the Logs, for example if a folder is deleted that folder (from the Old Log) is recorded as a difference and all files within it skipped. |
+
+
 
 ### Response Properties
 
