@@ -158,6 +158,72 @@ As FileLogCompare is written to support pre class enabled Powershell. The Old an
 | Log_ShowOutput | Outputs any buffered content. |
 | Log_Compare | Main routine to compare Logs. It is repetetively called from the main script code until both New and Old Logs have been completely read and closed. Once comparisons are made the function will skip necessary lines in the Logs, for example if a folder is deleted that folder (from the Old Log) is recorded as a difference and all files within it skipped. |
 
+#### FileBackup.ps1
+
+FileBackup is a script that uses FileLog and FileLogCompare to package altered files and directories into a compressed zip Backup. Optionaly, the created Backup can be uploaded to an Ftp server. Parameters:
+
+| Parameter | Description |
+| --- | --- |
+| -Store | Path to the directory used as the Store for Backups. Example "E:\\MyDocz\\FileBackup\\Store". |
+| -Name | The name of the Group to be backed up. The only real importance of the name is for use in Backup filenames so that it is identified what the Backup relates to. For example a name of "TestGroup" creates Backup files named "Backup_TestGroup_{timestamp}.zip", Log files named "Backup_TestGroup_{timestamp}.log" and Difference files named "Backup_TestGroup_{timestamp}.dif". |
+| -Path | The directory containing the Group's files. Example "E:\\MyDocz\\FileBackup\\TestGroup\\Live". |
+| -FtpHost | The host name (or IP Address) of the server to upload the Backup file. This is optional, if no FtpHost is specified, the Backup will not be uploaded to an Ftp server. |
+| -FtpUser | If uploading the file, this parameter must be supplied with the login user name. |
+| -FtpPassword | If uploading the file, this parameter must be supplied with the login password. |
+| -FtpPath | If uploading the file, this parameter may be supplied as the path on the server to upload the Backup to. If not supplied the Backup will be uploaded into the Ftp server's root directory. |
+| -Ignore | List of directories to ignore in the Backup. The directories should be relative to -Path. Directories should be separated by ';'. Example "Temp;Work\\Old;Work\\Temp" |
+ 
+The first function of FileBackup is to identify the Log file conmtained within the most recent BackUp. If no previous BackUps are found, FileBackup will use and compare against a Log file named "Backup_{Group}_Initial.log in the Store directory. This Log must be created manually, using the FileLog script, before the first BackUp is performed.
+
+It then calls FileLog to create a Log for this Backup. It then calls FileLogCompare to create a Difference file between the most recent and current Log files.
+
+It then creates the compressed zip Backup file and adds the current Log and Difference files into it. It then reads through the Differences file and the New or Modified files are added to the Backup.
+
+Up until the Backup file has been completed, the Log, Differences and Backup files are created under temporary names. This is performed so that if the process fails, they will not be picked up by subsequent backups which would result in its changes being lost. Only once the Backup has been successfully created is it renamed to its correct name. If the process fails for any reason, the script will try and remove all the temporary named files. Only once the Backup has been successfully created, and uploaded to the FTP server (if specified) will the Backup file name named appropriately. The new Log and Differences files are not retained as individual files, they are only retained within the Backup file.
+
+If the previous Log file used was the Initial file, once the BackUp is complete, this file is renamed to Backup_{Group}_Original.log. This is to ensure it is not inadvertantly picked up subsequently on failed runs.
+
+If the FtpHost is specified, the Backup will then be uploaded to this server.
+
+FileBackup will make 1 of the following console output messages:
+
+```FileBackup: {Group} No changes to files
+FileBackup: {Group} Backup complete {BackUpFilename}
+FileBackup: {Group} Backup complete and uploaded {BackUpFilename}
+```
+
+#### FileBackupBatch.ps1
+
+FileBackupBatch is a script that takes input from a configuration file to repeatedly call FileBackup to BackUp multiple Groups. Parameters:
+
+| Parameter | Description |
+| --- | --- |
+| -Config | Name of the Config file to use. This is optional and if not specified, the file "FileBackupBatch.cfg" in the directory the scripts are installed will be used. Example "E:\\MyDocz\\FileBackup\\Bin\\FileBackupBatch.cfg". |
+ 
+The Config file is a text file in the format of an '.ini' file. Each line should have an Item and Value pair separated by "=". Possible Items are as follows:
+
+| Item | Description |
+| --- | --- |
+| Store | Path to the directory used as the Store for Backups. This is passed as the Store parameter to FileBackUp. If different BackUps are to use different Stores, multiple Store lines can appear in the Config, the most recent in order will be used. |
+| Ftp | This specifies the Ftp options when calling FileBackup. A value of "None" indicates no Ftp transfer should be made. If an Ftp transfer should be made, the value should be in the format "FtpHost\*FtpUser\*FtpPassword\*FtpPath". Values need to be separated by "\*" characters. This item is optional and if not specified, BackUps created will not be uploaded to an Ftp server. If different BackUps are to use Ftp transfers, multiple Ftp lines can appear in the Config, the most recent in order will be used. |
+| Email | (Optional) If specified the summary produced by FileBackupBatch is also emailed to the specified address. The value should be specified as "From\*To\*SmtpServer". Values need to be separated by "\*" characters and represent the From Address, To Address and SMTP Server name. Only 1 Email setting is allowed in the Config file and it must come before the first Group setting. |
+| EmailCredentials | (Optional) If the Email setting is used, this may be included to set authentication for SMTP server in the format "User\*Password". If this is not set, the email will be sent unauthenticated. |
+| EmailSSLPort | (Optional) If the Email setting is used, if this may be included to specify a SSL connection and the value is the Port Number to use. If this is not set an unencrypted connection to the server will be made on Port 25. Ensure the SMTPServer in the 'Email' setting is the name used in the SSL certificate, this is particularly appropriate if you run your own email server locally which you may address differently in normal use. |
+| Group | This specifies a Group to BackUp. The value should be in the format "Name\*Path\*Ignore" specifying the Name, Path and Ignore parameters passed to FileBackup The Ignore value is optional. Multiple Group lines may be included in the Config file. |
+
+The Config file is processed sequentially. Therefore Store, Ftp and Email settings should be included in the Config file before Group lines. A sample Config file is as follows:
+
+```Store=E:\\MyDocz\\FileBackup\\Store
+Ftp=backup/mydocz.com\*BackupUser\*BackupPwd\*FileBackupStore
+Email=admin@mydocz.com\*admin@mydocz.com\*services.mydocz.com
+EmailCredentials = admin@mydocz.com\*AdminPwd
+EmailSSLPort = 587
+Group=TestGroup\*E:\\MyDocz\\FileBackup\\TestGroup\\Live\*Temp;Work\\Old;Work\\Temp
+```
+
+FileBackupBatch passes through the console output from FileBackup and completes output with the line "FileBackupBatch: Process complete". This can also be captured and once processing is complete, emailed to the address specified in the Config file. If a call to FileBackup throws an exception, the message from this exception is displayed as console output but does not terminate the FileBackupBatch process, it will continue to process any subsequent Groups in the Config file.
+
+If an exception occurs within the FileBackupBatch process itself, the summary as at that point will be emailed with the exception's message and the process will terminate at that point throwing the exception.
 
 
 ### Response Properties
