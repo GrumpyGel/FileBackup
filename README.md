@@ -138,6 +138,8 @@ FileLogCompare does not detect renamed or moved files or directories. If items a
 
 Ouput is a text file with each line representing a new or deleted directory or a new, modified or deleted file. Similar to CSV file, the data components are separated by '*' (as this can not appear in a file name). The fields are change type, object type and name. Change type can be "N"ew, "M"odified (files only) or "D"eleted. The object type can be "D"irectory or "File". The name is the directory or file name relative to the Group path. Examples:
 
+| Example | Meaning |
+| --- | --- |
 | N\*D\*Images\\Template | New directory named "Images\\Template". |
 | D\*D\*Survey | Directory Survey has been deleted. |
 | N\*F\*Images\\Template\\Logo.jpg | New file created called Logo.jpg in the Images\\Template directory. |
