@@ -35,7 +35,11 @@ Powershell scripts designed to provide incremental backup of directory structure
     <li><a href="#about-the-project">About The Project</a></li>
     <li><a href="#installation--usage">Installation &amp; Usage</a></li>
     <li><a href="#documentation">Documentation</a></li>
-    <li><a href="#documentation">Security</a></li>
+    <ol>
+      <li><a href="#terms">Terms</a></li>
+      <li><a href="#backup">Backup</a></li>
+      <li><a href="#unpack">Unpack</a></li>
+    </ol>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgements">Acknowledgements</a></li>
@@ -312,101 +316,6 @@ When FileUnpackBatch reads a Group record from the Config file, it checks the St
 FileUnpackBatch passes through the console output from FileUnpack and completes output with the line "FileUnpackBatch: Process complete". This can also be captured and once processing is complete, emailed to the address specified in the Config file. If a call to FileUnpack throws an exception, the message from this exception is displayed as console output and will stop processing of subsequent BackUp files for this Group, but does not terminate the FileUnpackBatch process, it will continue to process any subsequent Groups in the Config file.
 
 If an exception occurs within the FileBackupBatch process itself, the summary as at that point will be emailed with the exception's message and the process will terminate at that point throwing the exception.
-
-
-
-
-
-### Response Properties
-
-| Property | DataType | Description |
-| --- | --- | --- |
-| ErrNo | int | An error code that may be from mdzWebRequest or culr if using the proxy, see below |
-| ErrMsg | string | An error code that may be from mdzWebRequest or culr if using the proxy, see below |
-| ResponseCode | HttpStatusCode | The response status code returned by the server - see [https://docs.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view](https://docs.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode) |
-| ResponseType | string | The response Mine Content Type.  Any parameters following the Content type in the header supplied by the server are stripped, for example "text/html; charset=utf-8" will return just "text/html" |
-| ResponseTypeParams | string | Any parameters following the Content Type, for example "text/html; charset=utf-8" will return "charset=utf-8" |
-| IsBinary | bool | If True, the response has been treated as Binary and is therefore provided in the ResponseBinary property.  If False the response is treated as Text and is provided in the Response property |
-| Response | string | The response data returned by the server, if the IsBinary property is False |
-| ResponseBinary | byte[] | The response data returned by the server, if the IsBinary property is True |
-
-### Error Handling
-
-If the ErrNo property has a value of 0 after Submit() has been envoked, the requested was processed successfully.
-
-This does not necessarily mean that the resource requested performed correctly, the ResponseCode property should also be checked for OK/200 and any other logic associated with the request performed on the Response(/Binary) data.
-
-For direct (non-proxy) requests, other than the first 2 errors listed below, ErrNo will always return 0.  If an exception is thrown by the httpWebRequest wrapper, these are thrown back to the calling program.
-
-For proxy requests, exceptions should be less likely as they are trapped and return the 14011 and 14013 codes listed below.  Although this may not give such high detail on the actual error, it highlights what part of the process failed and the exact message is still returned.  If an error was returned by the curl request to the server, this is returned in ErrNo.
-
-| ErrNo | Description |
-| --- | --- |
-| 14001 | The URL property is blank |
-| 14002 | The Method property is not "GET", "POST" or "PUT" |
-| 14003 | The UseProxy property is True, but ProxyURL property is blank |
-| 14004 | The request was not allowed, client IP or Host blocked , see Configuration below.  This error will also be raised if you have Host exceptionsand the supplied URL property is invalid meaning the Host could not be extracted from it. |
-| 14011 | A proxy request was made, but an error was thrown communicating with the proxy, ErrMsg will include a description |
-| 14012 | The ResponseCode received from the proxy request was not 200 indicating failure, ErrMsg will include the ResponseCode  |
-| 14013 | An error occurred extracting the request response from the proxy response, ErrMsg will include a description |
-
-A list of curl ErrNo codes can be found at https://curl.se/libcurl/c/libcurl-errors.html
-
-When exceptions are raised within the mdzWebRequest class, even if they are not passed on as exception but return 14011 and 14013 error codes, the mdzSys.ErrorLog() function is called.  This can be configured to email details of the error raised and log them to a file.  These are configured within the <smpt> and <errorlog> sections of the mdzSys.config file and documented in the mdzSys.cs source.
-  
-### Configuration
-
-mdzWebRequest allows for validation of allowable client IP addresses (ie browser or service client IP) and Host server names in the URL property.  The following settings are available:
-
-| Setting | Description |
-| --- | --- |
-| IP_AutoAllow | A 'True' value means all client IP addresses are by default allowed, a 'False' value means no IP addresses are by default allowed |
-| Host_AutoAllow | A 'True' value means all hosts are by default allowed, a 'False' value means no hosts are by default allowed |
-| ValidationLog | If a log is required of validation failures, the log filename should be set here.  If the name is prefixed by a '~' character it will be created in the site directory.  If empty, no log is produced. |
-| Exception | Exceptions to the IP_AutoAllow and Host_AutoAllow settings can each be made as a separate Exception.  The Exception should have a "Type" attribute of "IP" or "Host" and a "Value" attribute of the IP address/Host name that is the exception.  IP address values can be IPV4 or IPV6 and can optionally include CIDR notation for subnet mask.  IPV6 code has not been tested. |
-  
-Configuration settings are made in the mdzWebRequest.config file which is in XML format.  The following example only allows client connection from 127.0.0.1 and 192.168.1.* IP addresses, only allows requests to be made to www.mydocz.com and will log validation failures in a file called 'mdzWebRequest.log':
-  
-```
-<mdzWebRequest IP_AutoAllow="False"
-               Host_AutoAllow="False"
-               ValidationLog="~mdzWebRequest.log">
-    <Exception Type="IP"   Value="127.0.0.1"/>
-    <Exception Type="IP"   Value="192.168.1.1/24"/>
-    <Exception Type="Host" Value="www.mydocz.com"/>
-</mdzWebRequest>
-```  
-
-Configuration is loaded by a singleton mdzWebRequestConfig class (defined in mdzWebRequest.cs).  This is loaded the first time mdzWebRequest is referenced and therefore improves performance as it does not need to be parsed for each use of mdzWebRequest.  However, once loaded it does not reload the configuration file.  Therefore if the configuration file is edited, the web site should be restarted to reload the mdzWebRequestConfig class.
-
-### Source Files
-
-The files comprising mdzWebRequest are as follows:
-  
-| Filename | Description |
-| --- | --- |
-| APP_CODE/mdzWebRequest.cs | The mdzWebRequest class written in c# |
-| APP_CODE/mdzSys.cs | A static singleton class with various helper functions used by MyDocz code including mdzWebServices.cs |
-| mdzWebRequestProxy.php | The mdzWebRequest proxy PHP program |
-| mdzWebRequest_Test.aspx | A program to test mdzWebRequest as used on the MyDocz web site |
-| mdzWebRequest_Test.xslt | The mdzWebRequest_Test pages HTML as a XSLT stylesheet |
-| mdzWebRequest_Test.css | CSS stylesheet used by mdzWebRequest_Test pages |
-| mdzWebRequest_Test.js | Javascript file used by mdzWebRequest_Test pages |
-| mdzWebRequest.config | Sample configuration file for mdzWebRequest (see Configuration above) |
-| mdzSys.config | Configuration file for mdzSys functions (see Error Handling above) |
-
-<!-- SECURITY -->
-## Security
-
- Although the mdzWebRequest class has configuration to filter IP addresses and hosts being connected to, the proxy component does not.
- 
- As mdzWebRequest_Proxy.php will forward all web requests it receives, it opens up 'relay' type security issues.  It currently has no facility to deny usage based on client IP or any other criteria.
-
-It should therefore not be installed on a publicly addressable server.
-
-It can though be hosted on the same server as the public site, but under a different web site.  The MyDocz site hosts mdzWebRequest.php on a separate site under the domain name of mdzwr.mydocz.com.  Normally, this site would be configured so that it only allows connection from trusted IP addresses, for example IP addresses within the local network (or loopback) where mdzWebRequest is running and under the control of the application using it.
-
-On the MyDocz site though the www.mydocz.com/mdzWebRequest_Test.aspx test page operates, which itself could be abused as a relay.  So simply restricting access to mdzwr.mydocz.com from local IPs would be pointless.  Instead the mdzwr.mydocz.com domain is also configured to only allow 2 requests per 10 seconds.  This is fine to stop abuse, and no live applications use this domain, but would not be practical in a normal live environment.
 
 
 <!-- LICENSE -->
