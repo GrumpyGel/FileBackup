@@ -17,13 +17,7 @@ Powershell scripts designed to provide incremental backup of directory structure
     <img src="source/images/SudokuScreen_2.png" alt="Logo" width="180">
   </a>
 
-  <h3 align="center">FileBackup</h3>
-
   <p align="center">
-    Alternative to httpWebRequest allowing modern ciphers on versions of Windows Server prior to 2022
-    <br />
-    <br />
-    <br />
     <a href="http://www.mydocz.com/mdzWebRequest_Test.aspx">View Demo</a>
     ·
     <a href="https://github.com/GrumpyGel/mdzWebRequest_Test/issues">Report Bug</a>
