@@ -138,16 +138,31 @@ FileLogCompare does not detect renamed or moved files or directories. If items a
 
 Ouput is a text file with each line representing a new or deleted directory or a new, modified or deleted file. Similar to CSV file, the data components are separated by '*' (as this can not appear in a file name). The fields are change type, object type and name. Change type can be "N"ew, "M"odified (files only) or "D"eleted. The object type can be "D"irectory or "File". The name is the directory or file name relative to the Group path. Examples:
 
+| N\*D\*Images\\Template | New directory named "Images\\Template". |
+| D\*D\*Survey | Directory Survey has been deleted. |
+| N\*F\*Images\\Template\\Logo.jpg | New file created called Logo.jpg in the Images\\Template directory. |
+| M\*F\*Data\\Settings.xml | The file called Settings.xml in the Data directory has been modified. |
+| D\*F\*APP_CODE\\clsQuery.cs | The file called clsQuery.cs in the APP_CODE directory has been deleted. |
+
+
+
+
+
+
+
+
 01 : N*D*Images\Template
 02 : D*D*Survey
 03 : N*F*Images\Template\Logo.jpg
 04 : M*F*Data\Settings.xml
 05 : D*F*APP_CODE\clsQuery.cs
+
 01 : New directory named "Images\Template".
 02 : Directory Survey has been deleted.
 03 : New file created called Logo.jpg in the Images\Template directory.
 04 : The file called Settings.xml in the Data directory has been modified.
 05 : The file called clsQuery.cs in the APP_CODE directory has been deleted.
+
 
 As FileLogCompare is written to support pre class enabled Powershell. The Old and New Logs are represented internally by Hashtables converted to Objects. Functionality is performed by various Log_* functions that operate on these arrays. They are:
 
