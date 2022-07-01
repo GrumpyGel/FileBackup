@@ -228,6 +228,92 @@ FileBackupBatch passes through the console output from FileBackup and completes 
 If an exception occurs within the FileBackupBatch process itself, the summary as at that point will be emailed with the exception's message and the process will terminate at that point throwing the exception.
 
 
+### Unpack
+
+The Unpack component of the FileBackup routines is used to take the incremental BackUp files and include their changes into a Duplicate safe directory that is always up-to-date, complete and ready to replace the Group. It contains the following scripts..
+
+| Script | Description |
+| --- | --- |
+| FileLog.ps1 | As used by the Backup component. |
+| FileLogCompare.ps1 | As used by the Backup component. |
+| FileUnpack.ps1 | Takes a BackUp file and applies the changes to the Duplicate. |
+| FileUnpackBatch.ps1 | Using a configuration file, this can be run manually or on a task scheduler to Unpack all BackUps found in the Store. |
+
+#### FileUnpack.ps1
+
+FileUnpack is a script that takes a BackUp file, reads the Differences file from it and applies the changes to a Duplicate directory. Any Directories or Files removed from the Duplicate are moved to an Archive. Modified files have their original in the Duplicate moved to the Archive. Parameters:
+
+| Script | Description |
+| --- | --- |
+| -Store | Path to the directory used as the Store for Backups. This may be the same Store used for the BackUp, or it may be the folder where BackUps are FTPed to if running on that server. Example "E:\\MyDocz\\FileBackup\\Store". |
+| -Backup | The name of the BackUp file to be Unpacked. Example "Backup_TestGroup_202105151324.zip". |
+| -Duplicate | The directory containing the Group's Duplicate files to be Unpacked into. Example "E:\\MyDocz\\FileBackup\\TestGroup\\Duplicate". |
+| -ArchiveStore | The directory where Archive directories are to be created. Example "E:\\MyDocz\\FileBackup\\TestGroup\\ArchiveStore". |
+| -Verify | If the Verify parameter is set (no value), once FileUnpack has applied the changes from the Backup to the Duplicate, it will then Verify that the content of Duplicate matches the Log contained in the BackUp. |
+
+FileUnpack will initially validate that the specified directories and BackUp file exist. It will then create an Archive directory in the ArchiveStore. The Archive will be named "Archive_{TimeStamp}" where the TimeStamp is taken from the BackUp file's name. If a directory with this name already exists (eg a previous Unpack failed) the archive will have an incrementing number applied to the name, for example "Archive_{TimeStamp}_2".
+
+The Differences file from the BackUp is then opened as a stream from the zip, and the changes applied to the Duplicate as follows:
+
+| Change | Description |
+| --- | --- |
+| Deleted Directory | Directory moved from Duplicate to Archive. |
+| New Directory | Directory created in Duplicate. |
+| Deleted File | File moved from Duplicate to Archive. |
+| New file | File extracted from BackUp into Duplicate. |
+| Modified file | File moved from Duplicate to Archive then extracted from BackUp into Duplicate. |
+
+Although the above is the 'normal' process, a New directory would also cause an existing directory of that name in the Duplicate to be moved to the Archive and similarly, if an existing file is found with the same name as a New file, that is also moved to the Archive. This may be due to previous failed Unpack processes or other unexpected conditions.
+
+Once the changes from the BackUp have been applied to the Duplicate, if the Verify parameter is specified the content of Duplicate will be verified to match the Log contained in the BackUp. To do this the Log in the BackUp is initially opened to extract any Ignore flag used when it was created. FileLog is then called to create a Log of the Duplicate using any found Ignore parameter. FileCompare is then called to create a Differences file between the Log file in the BackUp and the newly created Log file. If no Differences are found (the Differences file is 0 bytes in length) the content verified successfully and the Differences file deleted. If Differences were found, verification failed and the Differences file can be found in the ArchiveStore directory with the name "Verify_{GroupName}_{TimeStamp}.dif". The TimeStamp will match the BackUp file's TimeStamp.
+
+Once complete the process outputs a console message of either "FileUnpack: {BackUpFilename} unpack complete" or "FileUnpack: {BackUpFilename} no changes found". If the Duplicate was Verified, this message will be sufixed by either ", Verified OK" or ", Verify Failed Verify_{GroupName}_{TimeStamp}.dif".
+
+#### FileUnpackBatch.ps1
+
+FileUnpackBatch is a script that takes input from a configuration file to repeatedly call FileUnpack for any Backup files not previously Unpacked for multiple Groups. Parameters:
+
+| Parameter | Description |
+| --- | --- |
+| -Config | Name of the Config file to use. This is optional and if not specified, the file "FileUnpackBatch.cfg" in the directory the scripts are installed will be used. Example "E:\\MyDocz\\FileBackup\\Bin\\FileUnpackBatch.cfg". |
+
+The Config file is a text file in the format of an '.ini' file. Each line should have an Item and Value pair separated by "=". Possible Items are as follows:
+
+| Item | Description |
+| --- | --- |
+| Store | Path to the directory used as the Store for Backups. This may be the same Store used in FileBackUp or the location where BackUp files are Ftped to if running on a remote server. This is passed as the Store parameter to FileUnpack. If different BackUps use different Stores, multiple Store lines can appear in the Config, the most recent in order will be used. |
+| Verify | Instructs FileUnpackBatch when to Verify Duplicate content after Unpacking. Values can be:
+Never - No Verification will be made.
+Always - Verification will take place after all BackUps have been Unpacked.
+Weekly\*{DayOfWeek} - If being run on this day of the week Verification will take place, otherwise no Verification will be made. {DayOfWeek} should be a number between 0 and 6 representing the day. 0 may be Sunday or Monday depending on the system's culture settings.
+Monthly\*{DayOfMonth} - If being run on this day of the month Verification will take place, otherwise no Verification will be made. {DayOfMonth} should be a number between 1 and 31 representing the day. For day numbers above 28, obviously some month would skip Verification.
+The Verify setting applies to all Groups Unpacked. If no Verify setting is included, Verification will not take place. |
+| Email | (Optional) If specified the summary produced by FileUnpackBatch is also emailed to the specified address. The value should be specified as "From\*To\*SmtpServer". Values need to be separated by "\*" characters and represent the From Address, To Address and SMTP Server name. Only 1 Email setting is allowed in the Config file and it must come before the first Group setting. |
+| EmailCredentials | (Optional) If the Email setting is used, this may be included to set authentication for SMTP server in the format "User\*Password". If this is not set, the email will be sent unauthenticated. Only 1 EmailCredentials setting is allowed. |
+| EmailSSLPort | (Optional) If the Email setting is used, if this may be included to specify a SSL connection and the value is the Port Number to use. If this is not set an unencrypted connection to the server will be made on Port 25. Only 1 EmailSSLPort setting is allowed. |
+| Group | This specifies a Group to Unpack. The value should be in the format "Name\*Duplicate\*ArchivePath specifying the Name, Duplicate directory and ArchiveStore directory for this Group. The Duplicate and ArchiveStore components are passed as parameters to FileUnpack. The Name together with the Store config item are used to locate BackUp files needing to be Unpacked. Multiple Group lines may be included in the Config file and there must be at least 1. |
+
+
+The Config file is processed sequentially. Therefore Store and Email settings should be included in the Config file before Group lines. A sample Config file is as follows:
+
+```
+Store=E:\MyDocz\FileBackup\Store
+Email=admin@mydocz.com*admin@mydocz.com*services.mydocz.com
+EmailCredentials = admin@mydocz.com*AdminPwd
+EmailSSLPort = 587
+Group=TestGroup*E:\MyDocz\FileBackup\TestGroup\Duplicate*E:\MyDocz\FileBackup\TestGroup\ArchiveStore
+```
+
+When FileUnpackBatch reads a Group record from the Config file, it checks the Store directory for any BackUp files for the Group that have not been Unpacked - ie they do not have "unpacked" in the filename. It will then call FileUnpack for each BackUp file, setting the Duplicate and ArchiveStore parameters to that found on the Config record. It does this in LastWriteTime order of the BackUp files so that the incremental changes are made in order if there are multiple BackUp files for a Group.
+
+FileUnpackBatch passes through the console output from FileUnpack and completes output with the line "FileUnpackBatch: Process complete". This can also be captured and once processing is complete, emailed to the address specified in the Config file. If a call to FileUnpack throws an exception, the message from this exception is displayed as console output and will stop processing of subsequent BackUp files for this Group, but does not terminate the FileUnpackBatch process, it will continue to process any subsequent Groups in the Config file.
+
+If an exception occurs within the FileBackupBatch process itself, the summary as at that point will be emailed with the exception's message and the process will terminate at that point throwing the exception.
+
+
+
+
+
 ### Response Properties
 
 | Property | DataType | Description |
