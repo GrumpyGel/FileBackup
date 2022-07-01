@@ -187,7 +187,8 @@ If the FtpHost is specified, the Backup will then be uploaded to this server.
 
 FileBackup will make 1 of the following console output messages:
 
-```FileBackup: {Group} No changes to files
+```
+FileBackup: {Group} No changes to files
 FileBackup: {Group} Backup complete {BackUpFilename}
 FileBackup: {Group} Backup complete and uploaded {BackUpFilename}
 ```
@@ -213,12 +214,13 @@ The Config file is a text file in the format of an '.ini' file. Each line should
 
 The Config file is processed sequentially. Therefore Store, Ftp and Email settings should be included in the Config file before Group lines. A sample Config file is as follows:
 
-```Store=E:\\MyDocz\\FileBackup\\Store
-Ftp=backup/mydocz.com\*BackupUser\*BackupPwd\*FileBackupStore
-Email=admin@mydocz.com\*admin@mydocz.com\*services.mydocz.com
-EmailCredentials = admin@mydocz.com\*AdminPwd
+```
+Store=E:\MyDocz\FileBackup\Store
+Ftp=backup/mydocz.com*BackupUser*BackupPwd*FileBackupStore
+Email=admin@mydocz.com*admin@mydocz.com*services.mydocz.com
+EmailCredentials = admin@mydocz.com*AdminPwd
 EmailSSLPort = 587
-Group=TestGroup\*E:\\MyDocz\\FileBackup\\TestGroup\\Live\*Temp;Work\\Old;Work\\Temp
+Group=TestGroup*E:\MyDocz\FileBackup\TestGroup\Live*Temp;Work\Old;Work\Temp
 ```
 
 FileBackupBatch passes through the console output from FileBackup and completes output with the line "FileBackupBatch: Process complete". This can also be captured and once processing is complete, emailed to the address specified in the Config file. If a call to FileBackup throws an exception, the message from this exception is displayed as console output but does not terminate the FileBackupBatch process, it will continue to process any subsequent Groups in the Config file.
