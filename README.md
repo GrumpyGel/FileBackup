@@ -47,19 +47,16 @@ Powershell scripts designed to provide incremental backup of directory structure
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-A site I manage integrates to a 3rd Party that updated their SSL connectivity and in doing so restricted the number of allowable ciphers for clients to connect with to 3 (for TLS 1.2).  They are as follows:
+The FileBackup routines are Powershell scripts designed to provide incremental backup of directory structures (Groups) of files.
 
-TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256<br />
-TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384<br />
-TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 
+Backup files are created as Compressed (Zipped) folders containing any changed files, a directory Log at the time the backup was taken and a Difference file listing newly created or deleted Directories and newly created, modified or deleted Files.
 
-The managed site operates in a .Net environment and its httpWebRequest classes use the underlying operating system's https commmunication facilities. The 3 ciphers were not supported on anything other than Windows Server 2022 and we were not in a position to migrate to this platform.
+The backups are created on the same server (unless using mapped drives) but also have an Ftp option to transfer the backups to a remote server.
 
-I therefore investigated placing another server in our network to operate as a 'proxy' for our calls. The 3rd party uses Linux and PHP, so this was a natural choice.
+The directory Log from the most recent Backup is used to determine changes needed to be included in the current Backup. A Log must be manually created to initiate the then incremental BackUp.
 
-However, we have PHP installed on our Windows Servers, so investigated if curl within PHP would use these ciphers in a Windows environment.
+The routines also include an Unpack facility that takes Backup files and extracts changes to a duplicate Group directory structure. This provides a complete ready-to-use directory structure ideally on another hard drive/server using mapped drives or Ftp.
 
-They did indeed make use of these ciphers, so I have put together a mdzWebRequest package of PHP proxy and .Net class to wrap the .Net httpWebRequest class to optionally make use of the proxy.
 
 <!-- GETTING STARTED -->
 
@@ -74,14 +71,25 @@ Clone the repo
 <!-- DOCUMENTATION -->
 ## Documentation
 
-To make a web request using mdzWebRequest perform the following:
+### Terms
 
-<ol>
-<li>Create an instance of mdzWebRequest, for example MyRequest = new mdzWebRequest();</li>
-<li>Set the Request Properties</li>
-<li>Envoke the Submit() Method</li>
-<li>Check the Response Properties</li>
-</ol>
+Terms used in this documentation are as follows:
+
+| Term | Description |
+| --- | --- |
+| Text | The response is expected to be Text and will be returned in the Response property as a string, only use when safe to do so |
+| Binary | The response is expected to be Binary and will be returned in the ResponseBinary property as a byte[] |
+
+| Group | The Group of files to be BackedUp. The Group has a Path (directory) that contain the files. |
+| Duplicate | A directory FileBackup (Unpack) will replicate the Group's content into. |
+| Log file | A Log file containing directory listing of a Group. |
+| Differences file | A Differences file listing changes to directories and files between 2 (previous and current) Log files. |
+| BackUp | The BackUp file, compressed (zip) archive containing new or modified files plus Log and Differences file for this Backup. BackUp also refers to the process of creating a BackUp. |
+| Unpack | The process of taking a BackUp file and extracting its content into the Duplicate. |
+| Verify | The process of comparing the Duplicate content against a BackUp Log file. |
+| Store | A directory used by FileBackup to Store Backup files. The BackUp files contain the Group and timestamp in the filename and can accumulate in the Store for all Groups. |
+| Archive | A directory Unpack will create where deleted directories and deleted or update files from the Duplicate are moved to when Unpacking. This enables a roll back should it be required. |
+| ArchiveStore | A directory where Unpack will create Archives. Each Group should have its own ArchiveStore. |
 
 ### Request Properties
 
