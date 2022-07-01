@@ -115,7 +115,7 @@ Ouput is a text file with each line representing a directory or file. Similar to
 | --- | --- |
 | I* | If included, this will be the first line in the file. The 2nd (and only other) field on the line will contain the Ignore parameter value used when creating the Log. Example "I*Temp;Work\Old;Work\Temp". |
 | D* | Represents a Directory. The 2nd (and only other) field on the line will contain the Directory name. The name is relative to the Group directory. The Group Directory is included, with a blank name, and will be the first line in the file or 2nd if an Ignore record is present. Example "D*Images". |
-| F* | Represents a File. There are 3 following fields being the Name, Size and Last Write Time. Example "F*Logo.jpg*54321*20210306115426". |
+| F* | Represents a File. There are 3 following fields being the Name, Size and Last Write Time. Example "F\*Logo.jpg\*54321\*20210306115426". |
 
 The Directory is listed first, all files in the directory are then listed. Subdirectories are then recursed. Directories and Files within them are listed in alphabetic order.
 
