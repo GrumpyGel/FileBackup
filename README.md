@@ -115,8 +115,9 @@ Ouput is a text file with each line representing a directory or file. Similar to
 | --- | --- |
 | I* | If included, this will be the first line in the file. The 2nd (and only other) field on the line will contain the Ignore parameter value used when creating the Log. Example "I*Temp;Work\Old;Work\Temp". |
 | D* | Represents a Directory. The 2nd (and only other) field on the line will contain the Directory name. The name is relative to the Group directory. The Group Directory is included, with a blank name, and will be the first line in the file or 2nd if an Ignore record is present. Example "D*Images". |
-| F* | Represents a File. There are 3 following fields being the Name, Size and Last Write Time. Example "F*Logo.jpg*54321*20210306115426".
-The Directory is listed first, all files in the directory are then listed. Subdirectories are then recursed. Directories and Files within them are listed in alphabetic order. |
+| F* | Represents a File. There are 3 following fields being the Name, Size and Last Write Time. Example "F*Logo.jpg*54321*20210306115426". |
+
+The Directory is listed first, all files in the directory are then listed. Subdirectories are then recursed. Directories and Files within them are listed in alphabetic order.
 
 Main functionality of FileLog is via recursive calls to the CreateLog_Directory function. This add the directory name and all its files to the log, then calls CreateLog_Directory again for all its subdirectories. Log content is buffered into a string and then output once all files are added. This is to improve performance as the cmdlet is used to create the Log file rather than a stream.
 
