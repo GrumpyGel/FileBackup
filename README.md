@@ -77,9 +77,6 @@ Terms used in this documentation are as follows:
 
 | Term | Description |
 | --- | --- |
-| Text | The response is expected to be Text and will be returned in the Response property as a string, only use when safe to do so |
-| Binary | The response is expected to be Binary and will be returned in the ResponseBinary property as a byte[] |
-
 | Group | The Group of files to be BackedUp. The Group has a Path (directory) that contain the files. |
 | Duplicate | A directory FileBackup (Unpack) will replicate the Group's content into. |
 | Log file | A Log file containing directory listing of a Group. |
