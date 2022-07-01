@@ -127,16 +127,16 @@ The FileLogCompare script reads 2 Log files and produces a Differences file. Fil
 
 | Parameter | Description |
 | --- | --- |
-| -OldLog | The name of the older/previous Log file. This is the name of the Log file created during the last Backup, or the initial manually created Log for the first time a Backup is created. Example "E:\MyDocz\FileBackup\Store\Backup_TestGroup_Initial.log". |
-| -OldBackup | If the old Log file is contained within a Backup zip file, the OldBaxckup parameter should be used instead of OldLog and should contain the name of the previous Backup file. FileLogCompare will read the old Log file from within the Zip. Example "E:\MyDocz\FileBackup\Store\Backup_TestGroup_20210306.zip". |
-| -NewLog | The name of the newer/current Log file created during this Backup. Example "E:\MyDocz\FileBackup\Store\Backup_TestGroup_20210306.log". |
+| -OldLog | The name of the older/previous Log file. This is the name of the Log file created during the last Backup, or the initial manually created Log for the first time a Backup is created. Example "E:\\MyDocz\\FileBackup\\Store\\Backup_TestGroup_Initial.log". |
+| -OldBackup | If the old Log file is contained within a Backup zip file, the OldBaxckup parameter should be used instead of OldLog and should contain the name of the previous Backup file. FileLogCompare will read the old Log file from within the Zip. Example "E:\\MyDocz\\FileBackup\\Store\\Backup_TestGroup_20210306.zip". |
+| -NewLog | The name of the newer/current Log file created during this Backup. Example "E:\\MyDocz\\FileBackup\\Store\\Backup_TestGroup_20210306.log". |
 | -LogFile | Name of the Difference file to create. If not supplied output is displayed to console. Example "Backup_TestGroup_20210306.dif" |
 
 A file is deemed modified if the size if different or the modified timestamp is more than 3 seconds different. An exact match in timestamps is not required as moving files can truncate the milliseconds of the timestamp which results in seconds being rounded differently.
 
 FileLogCompare does not detect renamed or moved files or directories. If items are renamed or moved, their old name/location will be listed as deleted and current location as new.
 
-Ouput is a text file with each line representing a new or deleted directory or a new, modified or deleted file. Similar to CSV file, the data components are separated by '*' (as this can not appear in a file name). The fields are change type, object type and name. Change type can be "N"ew, "M"odified (files only) or "D"eleted. The object type can be "D"irectory or "File". The name is the directory or file name relative to the Group path. Examples:
+Ouput is a text file with each line representing a new or deleted directory or a new, modified or deleted file. Similar to CSV file, the data components are separated by '\*' (as this can not appear in a file name). The fields are change type, object type and name. Change type can be "N"ew, "M"odified (files only) or "D"eleted. The object type can be "D"irectory or "File". The name is the directory or file name relative to the Group path. Examples:
 
 | Example | Meaning |
 | --- | --- |
@@ -145,26 +145,6 @@ Ouput is a text file with each line representing a new or deleted directory or a
 | N\*F\*Images\\Template\\Logo.jpg | New file created called Logo.jpg in the Images\\Template directory. |
 | M\*F\*Data\\Settings.xml | The file called Settings.xml in the Data directory has been modified. |
 | D\*F\*APP_CODE\\clsQuery.cs | The file called clsQuery.cs in the APP_CODE directory has been deleted. |
-
-
-
-
-
-
-
-
-01 : N*D*Images\Template
-02 : D*D*Survey
-03 : N*F*Images\Template\Logo.jpg
-04 : M*F*Data\Settings.xml
-05 : D*F*APP_CODE\clsQuery.cs
-
-01 : New directory named "Images\Template".
-02 : Directory Survey has been deleted.
-03 : New file created called Logo.jpg in the Images\Template directory.
-04 : The file called Settings.xml in the Data directory has been modified.
-05 : The file called clsQuery.cs in the APP_CODE directory has been deleted.
-
 
 As FileLogCompare is written to support pre class enabled Powershell. The Old and New Logs are represented internally by Hashtables converted to Objects. Functionality is performed by various Log_* functions that operate on these arrays. They are:
 
