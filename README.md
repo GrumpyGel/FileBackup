@@ -282,17 +282,20 @@ The Config file is a text file in the format of an '.ini' file. Each line should
 | Item | Description |
 | --- | --- |
 | Store | Path to the directory used as the Store for Backups. This may be the same Store used in FileBackUp or the location where BackUp files are Ftped to if running on a remote server. This is passed as the Store parameter to FileUnpack. If different BackUps use different Stores, multiple Store lines can appear in the Config, the most recent in order will be used. |
-| Verify | Instructs FileUnpackBatch when to Verify Duplicate content after Unpacking. Values can be:
-Never - No Verification will be made.
-Always - Verification will take place after all BackUps have been Unpacked.
-Weekly\*{DayOfWeek} - If being run on this day of the week Verification will take place, otherwise no Verification will be made. {DayOfWeek} should be a number between 0 and 6 representing the day. 0 may be Sunday or Monday depending on the system's culture settings.
-Monthly\*{DayOfMonth} - If being run on this day of the month Verification will take place, otherwise no Verification will be made. {DayOfMonth} should be a number between 1 and 31 representing the day. For day numbers above 28, obviously some month would skip Verification.
-The Verify setting applies to all Groups Unpacked. If no Verify setting is included, Verification will not take place. |
+| Verify | Instructs FileUnpackBatch when to Verify Duplicate content after Unpacking. The Verify setting applies to all Groups Unpacked. If no Verify setting is included, Verification will not take place.  See table below for valid settings. |
 | Email | (Optional) If specified the summary produced by FileUnpackBatch is also emailed to the specified address. The value should be specified as "From\*To\*SmtpServer". Values need to be separated by "\*" characters and represent the From Address, To Address and SMTP Server name. Only 1 Email setting is allowed in the Config file and it must come before the first Group setting. |
 | EmailCredentials | (Optional) If the Email setting is used, this may be included to set authentication for SMTP server in the format "User\*Password". If this is not set, the email will be sent unauthenticated. Only 1 EmailCredentials setting is allowed. |
 | EmailSSLPort | (Optional) If the Email setting is used, if this may be included to specify a SSL connection and the value is the Port Number to use. If this is not set an unencrypted connection to the server will be made on Port 25. Only 1 EmailSSLPort setting is allowed. |
 | Group | This specifies a Group to Unpack. The value should be in the format "Name\*Duplicate\*ArchivePath specifying the Name, Duplicate directory and ArchiveStore directory for this Group. The Duplicate and ArchiveStore components are passed as parameters to FileUnpack. The Name together with the Store config item are used to locate BackUp files needing to be Unpacked. Multiple Group lines may be included in the Config file and there must be at least 1. |
 
+Valid settings for the Verify item are as follows:
+
+| Setting | Description |
+| --- | --- |
+| Never | No Verification will be made. |
+| Always | Verification will take place after all BackUps have been Unpacked. |
+| Weekly\*{DayOfWeek} | If being run on this day of the week Verification will take place, otherwise no Verification will be made. {DayOfWeek} should be a number between 0 and 6 representing the day. 0 may be Sunday or Monday depending on the system's culture settings. |
+| Monthly\*{DayOfMonth} | If being run on this day of the month Verification will take place, otherwise no Verification will be made. {DayOfMonth} should be a number between 1 and 31 representing the day. For day numbers above 28, obviously some month would skip Verification. |
 
 The Config file is processed sequentially. Therefore Store and Email settings should be included in the Config file before Group lines. A sample Config file is as follows:
 
