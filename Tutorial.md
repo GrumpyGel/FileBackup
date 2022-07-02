@@ -1,10 +1,24 @@
 # FileBackup Tutorial
 
-This tutorial takes you through the processes of testing the components are working, making an initial backup and then unpacking those changes into a duplicate structure.
+This tutorial takes you through the processes of setting up FileBackup and making an initial backup and then unpacking those changes into a duplicate structure.  This covers the basics of FileBackup and how it operates.
 
+It then moves on to implementing a practical Backup and Unpack process for ongoing backups.
 
 
 ## Table of Contents
+
+Setting up FileBackup and making an initial backup and then unpacking those changes into a duplicate structure.
+
+<ol>
+  <li><a href="1--prepare-filebackup">1. Prepare FileBackup</a></li>
+  <li><a href="#installation--usage">Installation &amp; Usage</a></li>
+  <li><a href="#documentation">Documentation</a></li>
+  <li><a href="#license">License</a></li>
+  <li><a href="#contact">Contact</a></li>
+  <li><a href="#acknowledgements">Acknowledgements</a></li>
+</ol>
+
+Implementing a practical Backup and Unpack process
 
 <ol>
   <li><a href="#create-an-initial-log-file">Create an Initial Log file</a></li>
@@ -16,7 +30,7 @@ This tutorial takes you through the processes of testing the components are work
 </ol>
 
 
-## Prepare For Tutorial
+## 1. Prepare FileBackup
 
 The first step is to download and install FileBackup.  See intructions at [https://github.com/GrumpyGel/FileBackup](https://github.com/GrumpyGel/FileBackup).
 
@@ -36,7 +50,7 @@ To prepare for the tutorial perform the following:
 When implementing FileBackup in a live environment, the first step above would not need to be performed - you already have the Group you wish to back up.  The remaining steps would need to be taken though so that you have an environment for FileBackup to operate within.
 
   
-## Create an Initial Log file
+## 2. Create an Initial Log file
 
 To initiate a FileBackup process, an "Initial" Log file must be created.  This is the "known state" before your incremental backups begin.  It is performed as follows:
 
@@ -63,7 +77,7 @@ The date and time stamp will look different as these will be as when you downloa
 When implementing in a Live environment, you would need to perform this step.
 
 
-## Ensure Duplicate is up-to-date
+## 3. Ensure Duplicate is up-to-date
 
 If using FileBackup and FileUnpack to maintain a complete up-to-date Duplicate directory for the Group, the Duplicate must be identical to the main Group directory before initiating the first BackUp.
 
@@ -81,9 +95,9 @@ You can deleted the Duplicate_TestGroup.log and Duplicate_TestGroup.dif files to
 When implementing in a Live environment, you should perform this step to ensure you have the environment set up correctly.
 
   
-## Ensure FileCompare can detect changes
+## 4. Show FileCompare detecting changes
 
-To ensure FileCompare can detect changes we can modify a file, produce a new Log file and create a Differences file for this new Log against the Initial.
+To show FileCompare detecting changes we can modify a file, produce a new Log file and create a Differences file for this new Log against the Initial.
   
 This also demonstrates how changes are found and provides changes for the FileBackup tutorial below to process.
 
@@ -105,7 +119,7 @@ You can delete the Test_TestGroup.log and Test_TestGroup.dif files to tidy up th
 When implementing in a Live environment, you should perform this step so that you can subsequently ensure the backup is working correctly.
 
   
-## Create a BackUp
+## 5. Create a BackUp
 
 Having made the above change to a file, we can now create a BackUp of it using the following command:
 
@@ -134,7 +148,7 @@ The Initial Log file created above in the Store will also have been renamed from
 When implementing in a Live environment, this will be your first 'real' backup.  You can add this command to a Task Scheduler process to regularly backup your Group.  However, you may wish to include other options - such as uploading to an FTP server or as running as part of a FileBackupBatch to include other Groups and/or email confirmation.
 
 
-## UnPack BackUp into Duplicate
+## 6. UnPack BackUp into Duplicate
 
 Having created the BackUp, we can now UnPack it into the Duplicate.  This will maintain it in sync with the Live Group, as follows:
 
@@ -153,3 +167,16 @@ The default.aspx file in the Duplicate directory should now match the change mad
 In the ArchiveStore directory (E:\\FileBackup\\TestGroup\\ArchiveStore) an Archive named Archive_{TimeStamp} will have been created. This will contain the default.aspx file that was overwritten in the Duplicate directory.
 
 In the Store directory (E:\\FileBackup\\Store) the BackUp file Backup_TestGroup_{TimeStamp}.zip will have been renamed Backup_TestGroup_Unpacked_{TimeStamp}.zip.
+
+
+
+
+
+```
+Store = E:\MyDocz\FileBackup\Store
+Ftp = 192.168.1.6*BackupDyn*r=j42uka*BackupStore
+Email = angela@mydocz.com*gerald@mydocz.com*services.mydocz.com
+EmailCredentials = angela@mydocz.com*max1eagles2
+EmailSSLPort = 587
+Group = TestGroup*E:\MyDocz\FileBackup\TestGroup\Live*Temp
+```
