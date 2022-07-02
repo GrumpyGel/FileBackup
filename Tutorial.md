@@ -31,7 +31,7 @@ To prepare for the tutorial perform the following:
   <li>Make a folder "E:\\MyDocz\\FileBackup\\TestGroup\\Store" - this will be the Store directory where backups are created/held.</li>
   <li>Copy the "E:\\MyDocz\\FileBackup\\TestGroup\\Live" directory to ""E:\\MyDocz\\FileBackup\\TestGroup\\Duplicate" - the 'Duplicate' direcotry then becomes our Duplicate that we will replicate Live into.  Normally this would be on a different disk or server.</li>
   <li>Make a folder "E:\\MyDocz\\FileBackup\\TestGroup\\Archive" - this will be the ArchiveStore where replaced/removed files from the Duplicate are placed when backups are uunpacked into the Duplicate.</li>
-<ol>
+</ol>
 
 When implementing FileBackup in a live environment, the first step above would not need to be performed - you already have the Group you wish to back up.  The remaining steps would need to be taken though so that you have an environment for FileBackup to operate within.
 
