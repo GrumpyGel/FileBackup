@@ -169,14 +169,15 @@ In the ArchiveStore directory (E:\\FileBackup\\TestGroup\\ArchiveStore) an Archi
 In the Store directory (E:\\FileBackup\\Store) the BackUp file Backup_TestGroup_{TimeStamp}.zip will have been renamed Backup_TestGroup_Unpacked_{TimeStamp}.zip.
 
 
+## 7. Create a BackUp Batch
 
-
+A live implementation is likely to be a BackUp Batch.  This allows us to easily configure FTP, BackUp multiple Groups and send a confirmation e-Mails of the BackUp's results.
 
 ```
-Store = E:\MyDocz\FileBackup\Store
+Store = E:\FileBackup\Store
 Ftp = 192.168.1.6*BackupDyn*r=j42uka*BackupStore
 Email = angela@mydocz.com*gerald@mydocz.com*services.mydocz.com
 EmailCredentials = angela@mydocz.com*max1eagles2
 EmailSSLPort = 587
-Group = TestGroup*E:\MyDocz\FileBackup\TestGroup\Live*Temp
+Group = TestGroup*E:\FileBackup\TestGroup\Live*Temp
 ```
