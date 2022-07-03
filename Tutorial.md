@@ -9,25 +9,25 @@ It then moves on to implementing a practical Backup and Unpack process for ongoi
 
 Setting up FileBackup and making an initial backup and then unpacking those changes into a duplicate structure.
 
-<ol>
+<ul>
   <li><a href="#1-prepare-filebackup">1. Prepare FileBackup</a></li>
-  <li><a href="#installation--usage">Installation &amp; Usage</a></li>
-  <li><a href="#documentation">Documentation</a></li>
-  <li><a href="#license">License</a></li>
-  <li><a href="#contact">Contact</a></li>
-  <li><a href="#acknowledgements">Acknowledgements</a></li>
-</ol>
+  <li><a href="#2-create-initial-log-file">2. Create Initial Log file</a></li>
+  <li><a href="#3-ensure-duplicate-is-up-to-date">3. Ensure Duplicate is up-to-date</a></li>
+  <li><a href="#4-show-filecompare-detecting-changes">4. Show FileCompare detecting changes</a></li>
+  <li><a href="#5-create-a-backup">5. Create a BackUp</a></li>
+  <li><a href="#6-unpack-backup-into-duplicate">6. UnPack BackUp into Duplicate</a></li>
+</ul>
 
 Implementing a practical Backup and Unpack process
 
-<ol>
+<ul>
   <li><a href="#create-an-initial-log-file">Create an Initial Log file</a></li>
   <li><a href="#installation--usage">Installation &amp; Usage</a></li>
   <li><a href="#documentation">Documentation</a></li>
   <li><a href="#license">License</a></li>
   <li><a href="#contact">Contact</a></li>
   <li><a href="#acknowledgements">Acknowledgements</a></li>
-</ol>
+</ul>
 
 
 ## 1. Prepare FileBackup
@@ -50,7 +50,7 @@ To prepare for the tutorial perform the following:
 When implementing FileBackup in a live environment, the first step above would not need to be performed - you already have the Group you wish to back up.  The remaining steps would need to be taken though so that you have an environment for FileBackup to operate within.
 
   
-## 2. Create an Initial Log file
+## 2. Create Initial Log file
 
 To initiate a FileBackup process, an "Initial" Log file must be created.  This is the "known state" before your incremental backups begin.  It is performed as follows:
 
