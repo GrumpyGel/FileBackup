@@ -10,7 +10,7 @@ It then moves on to implementing a practical Backup and Unpack process for ongoi
 Setting up FileBackup and making an initial backup and then unpacking those changes into a duplicate structure.
 
 <ol>
-  <li><a href="1--prepare-filebackup">1. Prepare FileBackup</a></li>
+  <li><a href="#1-prepare-filebackup">1. Prepare FileBackup</a></li>
   <li><a href="#installation--usage">Installation &amp; Usage</a></li>
   <li><a href="#documentation">Documentation</a></li>
   <li><a href="#license">License</a></li>
