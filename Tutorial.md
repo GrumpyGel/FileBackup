@@ -173,11 +173,90 @@ In the Store directory (E:\\FileBackup\\Store) the BackUp file Backup_TestGroup_
 
 A live implementation is likely to be a BackUp Batch.  This allows us to easily configure FTP, BackUp multiple Groups and send a confirmation e-Mails of the BackUp's results.
 
+Our tutorial will perform the same backup as the "5. Create a Backup" step above.  It will also FTP the backup onto another server and send an email notification.
+
+Create a file "MyBackup.cfg" in the E:\FileBackup\TestGroup directory and paste the following as its content...
+
 ```
-Store = E:\FileBackup\Store
-Ftp = 192.168.1.6*BackupDyn*r=j42uka*BackupStore
-Email = angela@mydocz.com*gerald@mydocz.com*services.mydocz.com
-EmailCredentials = angela@mydocz.com*max1eagles2
+Email = filebackup@mydocz.com*admin@mydocz.com*services.mydocz.com
+EmailCredentials = filebackup@mydocz.com*EmailPassword
 EmailSSLPort = 587
+Ftp = backup.mydocz.com*filebackup*FtpPassword*
+Store = E:\FileBackup\Store
 Group = TestGroup*E:\FileBackup\TestGroup\Live*Temp
 ```
+
+If you do not wish the send email notification, remove the 3 lines beginning "Email", otherwise... Set the email From address, To address and SMTP server name on the line beginning "Email =".  Set the email server login user name and password on the line beginning "EmailCredentials =" and the SSL port to use on the line beginning "EmailSSLPort =".
+
+If you do not have an FTP server to upload the backups to, remove the line beginning "Ftp = ".  If you do have an FTP server, change "backup.mydocz.com" to the host name or IP address for it.  I have created a login on my FTP server under the user name "filebackup" which has its root directory set to the Store on the remote host.  Therefore no directory is set in the "Ftp = " line, if your Store directory is not the root of the login, it should be included at the end of the line, after the last '*'.  Change the username and password appropriate to your server.
+
+As stated, this will perform the same backup as used previously, therefore the Store is set to E:\FileBackup\Store, we give it a name of "TestGroup", it is backing up the contents of the E:\FileBackup\TestGroup\Live directory but ignoring the Temp subdirectory.  In live implementation, change these as appropriate.
+
+The BackupBatch can be executed with the following command:
+
+```
+E:\FileBackup\bin\FileBackupBatch.ps1 -Config E:\FileBackup\TestGroup\MyBackup.cfg
+```
+
+As we have not made any changes since the previous backup, no backup file should be created and the command should display the following results:
+
+```
+FileBackup: TestGroup No changes to files
+FileBackupBatch: Process complete
+```
+
+If an email was configured to be sent, one should be received as follows:
+
+```
+Subject : FileBackupBatch Processing
+
+FileBackup: TestGroup No changes to files
+FileBackupBatch: Process complete
+```
+
+We can then make a change to a file and test a backup being created.  Modify the E:\FileBackup\TestGroup\Live\default.aspx file again (for example add a blank line and save the file) and then reissue the above command.  This time, a backup file should be created in the Store and uploaded to the FTP server store if configured.  The command should display the following results:
+
+```
+FileBackup: TestGroup Backup complete and uploaded E:\FileBackup\TestGroup\Store\Backup_TestGroup_{TimeStamp}.zip
+FileBackupBatch: Process complete
+```
+
+If an email was configured to be sent, one should be received as follows:
+
+```
+Subject : FileBackupBatch Processing
+
+FileBackup: TestGroup Backup complete and uploaded E:\MyDocz\FileBackup\TestGroup\Store\Backup_TestGroup_{TimeStamp}.zip
+FileBackupBatch: Process complete
+```
+
+If a live implementation is backing up multiple Groups, the following Config file shows multiple Groups (TestGroup and AppNo2) being backed up into the same Store (Store):
+
+```
+Email = filebackup@mydocz.com*admin@mydocz.com*services.mydocz.com
+EmailCredentials = filebackup@mydocz.com*EmailPassword
+EmailSSLPort = 587
+Ftp = backup.mydocz.com*filebackup*FtpPassword*
+Store = E:\FileBackup\Store
+Group = TestGroup*E:\FileBackup\TestGroup\Live*Temp
+Group = AppNo2*E:\AppNo2Dir*
+```
+
+The following shows multiple Groups (TestGroup and AppNo2) being backed up into different Stores (StoreTestGroup and StoreAppNo2):
+
+```
+Email = filebackup@mydocz.com*admin@mydocz.com*services.mydocz.com
+EmailCredentials = filebackup@mydocz.com*EmailPassword
+EmailSSLPort = 587
+Ftp = backup.mydocz.com*filebackup*FtpPassword*StoreTestGroup
+Store = E:\FileBackup\StoreTestGroup
+Group = TestGroup*E:\FileBackup\TestGroup\Live*Temp
+Ftp = backup.mydocz.com*filebackup*FtpPassword*StoreAppNo2
+Store = E:\FileBackup\StoreAppno2
+Group = AppNo2*E:\AppNo2Dir*
+```
+
+
+
+
+
