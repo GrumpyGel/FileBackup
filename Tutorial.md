@@ -173,6 +173,8 @@ In the Store directory (E:\\FileBackup\\Store) the BackUp file Backup_TestGroup_
 
 A live implementation is likely to be a BackUp Batch.  This allows us to easily configure FTP, BackUp multiple Groups and send a confirmation e-Mails of the BackUp's results.
 
+The command executed below can be added to Task Scheduler to create an ongoing backup of 1 or more Groups.  Multiple tasks can also be created if Groups are to be backed up independently, for example they are to be backed up at different times.
+
 Our tutorial will perform the same backup as the "5. Create a Backup" step above.  It will also FTP the backup onto another server and send an email notification.
 
 Create a file "MyBackup.cfg" in the E:\FileBackup\TestGroup directory and paste the following as its content...
