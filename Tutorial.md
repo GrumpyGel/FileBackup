@@ -21,12 +21,8 @@ Setting up FileBackup and making an initial backup and then unpacking those chan
 Implementing a practical Backup and Unpack process
 
 <ul>
-  <li><a href="#create-an-initial-log-file">Create an Initial Log file</a></li>
-  <li><a href="#installation--usage">Installation &amp; Usage</a></li>
-  <li><a href="#documentation">Documentation</a></li>
-  <li><a href="#license">License</a></li>
-  <li><a href="#contact">Contact</a></li>
-  <li><a href="#acknowledgements">Acknowledgements</a></li>
+  <li><a href="#7-create-a-backUp-batch">7. Create a BackUp Batch</a></li>
+  <li><a href="#8-create-an-unpack-batch">8. Create an UnPack Batch</a></li>
 </ul>
 
 
@@ -259,6 +255,53 @@ Group = AppNo2*E:\AppNo2Dir*
 ```
 
 
+## 8. Create an UnPack Batch
 
+A live implementation is likely to be an Unpack Batch.  This allows us to easily find all backups that have not been UnPacked, UnPack multiple Groups and send a confirmation e-Mails of the UnPack's results.
 
+The command executed below can be added to Task Scheduler to create an ongoing UnPack of 1 or more Groups.  Multiple tasks can also be created if Groups are to be UnPacked independently, for example they are to be UnPacked up at different times.
 
+Our tutorial will perform the same UnPack as the "6. UnPack BackUp into Duplicate" step above however we do not need to specify the name of the BackUp file (which is difficult in a script as it contains the time stamp) as FileUnPackBatch processed all BackUps in the Store that have not previously been UnPacked.  It will also send an email notification. It assumes you have run the above steps so that you have a working BackUp process that has been performed.
+
+Create a file "MyUnPack.cfg" in the E:\FileBackup\TestGroup directory and paste the following as its content...
+
+```
+Email = filebackup@mydocz.com*admin@mydocz.com*services.mydocz.com
+EmailCredentials = filebackup@mydocz.com*EmailPassword
+EmailSSLPort = 587
+Verify = Always
+Store = E:\FileBackup\Store
+Group = TestGroup*E:\FileBackup\TestGroup\Duplicate*E:\FileBackup\TestGroup\ArchiveStore
+```
+
+The email options can be set or removed as in "7. Create a BackUp Batch".  After each Unpack we will Verify the Duplicate.
+
+As stated, this will perform the same UnPack as used previously, therefore the Store is set to E:\FileBackup\Store, we give it a name of "TestGroup", it is UnPacking the contents into the E:\FileBackup\TestGroup\Duplicate and using the E:\FileBackup\TestGroup\ArchiveStore directory for our ArchiveStore.  In live implementation, change these as appropriate.
+
+The UnPackBatch can be executed with the following command:
+
+```
+E:\FileBackup\bin\FileUnpackBatch.ps1 -Config E:\FileBackup\TestGroup\MyUnPack.cfg
+```
+
+As there is at least 1 Backup file, the command should display the following results:
+
+```
+FileUnpack: Backup_TestGroup_{TimeStamp1}.zip unpack complete, Verified OK
+FileUnpack: Backup_TestGroup_{TimeStamp2}.zip unpack complete, Verified OK
+FileUnpackBatch: Process complete
+```
+
+The number of lines displayed will be dependent on the number of Backup files found to UnPack.  
+
+If an email was configured to be sent, one should be received as follows:
+
+```
+Subject : FileUnpackBatch Processing
+
+FileUnpack: Backup_TestGroup_{TimeStamp1}.zip unpack complete, Verified OK
+FileUnpack: Backup_TestGroup_{TimeStamp2}.zip unpack complete, Verified OK
+FileUnpackBatch: Process complete
+```
+
+In a live environment, multiple Groups can be UnPacked by repeating the Group, and if necessary Store, line in the Config file for each Group.
