@@ -1,5 +1,6 @@
 # FileBackup
-Powershell scripts designed to provide incremental backup of directory structures (Groups) of files.
+
+Powershell scripts designed to provide incremental backup of directory structures (Groups) of files and keep local or remote replicated directories (Duplicates) up-to-date.
 
 
 [![Contributors][contributors-shield]][contributors-url]
