@@ -37,6 +37,7 @@ Powershell scripts designed to provide incremental backup of directory structure
       <li><a href="#terms">Terms</a></li>
       <li><a href="#backup">Backup</a></li>
       <li><a href="#unpack">Unpack</a></li>
+      <li><a href="#tutorial">Tutorial</a></li>
     </ol>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -314,6 +315,11 @@ When FileUnpackBatch reads a Group record from the Config file, it checks the St
 FileUnpackBatch passes through the console output from FileUnpack and completes output with the line "FileUnpackBatch: Process complete". This can also be captured and once processing is complete, emailed to the address specified in the Config file. If a call to FileUnpack throws an exception, the message from this exception is displayed as console output and will stop processing of subsequent BackUp files for this Group, but does not terminate the FileUnpackBatch process, it will continue to process any subsequent Groups in the Config file.
 
 If an exception occurs within the FileBackupBatch process itself, the summary as at that point will be emailed with the exception's message and the process will terminate at that point throwing the exception.
+
+
+### Tutorial
+
+This documentation provides syntax and definition for the FileBackup components.  A tutorial working through demonstrations of Backup, Unpack and 'real life' implementation can be found on the [Tutorial Page](https://github.com/GrumpyGel/FileBackup/tutorial.md).
 
 
 <!-- LICENSE -->
