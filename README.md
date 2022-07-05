@@ -319,7 +319,7 @@ If an exception occurs within the FileBackupBatch process itself, the summary as
 
 ### Tutorial
 
-This documentation provides syntax and definition for the FileBackup components.  A tutorial working through demonstrations of Backup, Unpack and 'real life' implementation can be found on the [Tutorial Page](https://github.com/GrumpyGel/FileBackup/tutorial.md).
+This documentation provides syntax and definition for the FileBackup components.  A tutorial working through demonstrations of Backup, Unpack and 'real life' implementation can be found on the [Tutorial Page](https://github.com/GrumpyGel/FileBackup/blob/main/Tutorial.md).
 
 
 <!-- LICENSE -->
