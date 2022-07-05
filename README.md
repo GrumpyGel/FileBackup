@@ -14,12 +14,10 @@ Powershell scripts designed to provide incremental backup of directory structure
 <br />
 <p align="center">
   <a href="https://github.com/GrumpyGel/FileBackup">
-    <img src="source/images/SudokuScreen_2.png" alt="Logo" width="180">
+    <img src="FileBackup.jpg" alt="Logo" width="640">
   </a>
 
   <p align="center">
-    <a href="http://www.mydocz.com/mdzWebRequest_Test.aspx">View Demo</a>
-    ·
     <a href="https://github.com/GrumpyGel/mdzWebRequest_Test/issues">Report Bug</a>
     ·
     <a href="https://github.com/GrumpyGel/mdzWebRequest_Test/issues">Request Feature</a>
